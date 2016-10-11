@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Timer</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed|Roboto+Mono" rel="stylesheet" />
+    <style>
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  text-align: center;
+  position: relative;
+  background: linear-gradient(#0ae, #4cf);
+}
+
+#timer {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clock-time {
+  font-family: 'Roboto Mono', monospace;
+  color: #fff;
+  font-size: 5em;
+  text-shadow: 0 0 0.2em #fff;
+}
+
+.clock-button {
+  background: #1E88E5;
+  color: #fff;
+  
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 1em;
+  text-transform: uppercase;
+  
+  border-radius: 4px;
+  padding: 8px;
+  min-width: 100px;
+
+  border: none;
+
+  transition: background 0.5s, box-shadow 0.5s;
+}
+
+.clock-button:hover {
+  background: #2196F3;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+    </style>
+  </head>
+  <body>
+    <script src="https://unpkg.com/react@15.3.2/dist/react.min.js"></script>
+    <script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
+
+    <div id='timer'></div>
+
+    <script type='text/babel'>
+      if (!String.prototype.format) {
+        String.prototype.format = function() {
+          var args = arguments;
+          return this.replace(/{(\d+)}/g, function(match, number) { 
+            return typeof args[number] != 'undefined'
+              ? args[number]
+              : match
+            ;
+          });
+        };
+      }
+
+      var Timer = React.createClass({
+        getInitialState: function() {
+          return {
+            start: 0,
+            time: 0,
+            started: false,
+          };
+        },
+        isActive: function(){},
+
+        startTimer: function() {
+          clearInterval(this.interval)
+          var now = Date.now()
+          this.setState({
+            start: now,
+            time: 0,
+            started: true,
+          })
+          this.interval = setInterval(this.updateTime, 500);
+        },
+        
+        updateTime: function() {
+          this.setState({
+            time: Date.now() - this.state.start,
+          })
+        },
+
+        stopTimer: function() {
+          this.setState({
+            started: false,
+          })
+          clearInterval(this.interval);
+        },
+
+        render: function() {
+
+          var startButton = (
+            <button className='clock-button' onClick={this.startTimer}>
+              Start
+            </button>
+          );
+
+          var stopButton = (
+            <button className='clock-button' onClick={this.stopTimer}>
+              Stop
+            </button>
+          );
+
+          var hours = Math.floor(this.state.time / 60 / 60 / 1000)
+          var minutes = Math.floor(this.state.time / 60 / 1000)
+          var seconds = Math.floor(this.state.time / 1000)
+          var lPad = function(a){return (a < 10 ? "0" : "") + a;}
+          var formatted = "{0}:{1}:{2}".format(lPad(hours), lPad(minutes), lPad(seconds))
+
+          var clock = (
+            <div className='clock-time'>{formatted}</div>
+          );
+
+          return (
+            <div>
+              {clock}
+              {this.state.started ? stopButton : startButton}
+            </div>
+          );
+        },
+      })
+
+      ReactDOM.render(<Timer />, timer);
+    </script>
+
+  </body>
+</html>
